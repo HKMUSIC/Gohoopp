@@ -2,22 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "Gohoopp/backend/app.py",
+      "src": "backend/app.py",
       "use": "@vercel/python"
     },
     {
-      "src": "Gohoopp/index.html",
+      "src": "index.html",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "Gohoopp/backend/app.py"
+      "dest": "backend/app.py"
     },
     {
       "src": "/(.*)",
-      "dest": "Gohoopp/index.html"
+      "dest": "/index.html"
     }
   ]
 }
