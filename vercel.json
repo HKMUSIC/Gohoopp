@@ -13,3 +13,17 @@
     }
   ]
 }
+{
+  "builds":[
+    {
+      "src":"shivu/web/backend/app.py",
+      "use":"@vercel/python"
+    }
+  ],
+  "routes":[
+    {
+      "src":"/(.*)",
+      "dest":"shivu/web/backend/app.py"
+    }
+  ]
+}
