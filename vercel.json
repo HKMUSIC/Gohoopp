@@ -2,22 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "shivu/web/backend/app.py",
+      "src": "Gohoopp/backend/app.py",
       "use": "@vercel/python"
     },
     {
-      "src": "shivu/web/frontend/index.html",
+      "src": "Gohoopp/index.html",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "shivu/web/backend/app.py"
+      "dest": "Gohoopp/backend/app.py"
     },
     {
       "src": "/(.*)",
-      "dest": "shivu/web/frontend/index.html"
+      "dest": "Gohoopp/index.html"
     }
   ]
 }
