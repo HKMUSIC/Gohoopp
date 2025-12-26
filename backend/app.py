@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from shivu.web.backend.db import *
+from Gohoopp.db import *
 
 app = FastAPI()
 
