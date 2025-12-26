@@ -2,28 +2,22 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.html",
+      "src": "shivu/web/backend/app.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "shivu/web/frontend/index.html",
       "use": "@vercel/static"
     }
   ],
   "routes": [
     {
+      "src": "/api/(.*)",
+      "dest": "shivu/web/backend/app.py"
+    },
+    {
       "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
-}
-{
-  "builds":[
-    {
-      "src":"shivu/web/backend/app.py",
-      "use":"@vercel/python"
-    }
-  ],
-  "routes":[
-    {
-      "src":"/(.*)",
-      "dest":"shivu/web/backend/app.py"
+      "dest": "shivu/web/frontend/index.html"
     }
   ]
 }
