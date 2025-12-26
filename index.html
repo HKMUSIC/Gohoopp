@@ -283,3 +283,19 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 </body>
 </html>
+
+
+{
+  "builds": [
+    {
+      "src": "shivu/web/app.py",
+      "use": "@vercel/python"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "shivu/web/app.py"
+    }
+  ]
+}
