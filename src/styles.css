@@ -1,0 +1,25 @@
+body {
+  margin: 0;
+  background: #111;
+  overflow: hidden;
+}
+
+#toolbar {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #222;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+button {
+  font-size: 18px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+canvas {
+  display: block;
+}
