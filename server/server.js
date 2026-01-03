@@ -2,6 +2,7 @@ const express = require("express");
 const http = require("http");
 const { Server } = require("socket.io");
 const cors = require("cors");
+const path = require("path");
 
 const {
   createRoom,
@@ -18,10 +19,17 @@ const io = new Server(server, {
 });
 
 app.use(cors());
-app.use(express.static("public"));
 app.use(express.json());
 
-// 🔐 Create room (called by Telegram bot later)
+// ✅ SERVE PUBLIC WHITEBOARD
+app.use(express.static(path.join(__dirname, "../public")));
+
+// ✅ ROOT ROUTE (FIXES Cannot GET /)
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
+
+// 🔐 Create room (Telegram bot will call this)
 app.get("/create", (req, res) => {
   const { game, explainer } = req.query;
   if (!game || !explainer) return res.sendStatus(400);
@@ -66,6 +74,7 @@ io.on("connection", socket => {
   });
 });
 
-server.listen(3000, () => {
-  console.log("✅ Whiteboard running on http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+server.listen(PORT, () => {
+  console.log("✅ Whiteboard running on http://localhost:" + PORT);
 });
