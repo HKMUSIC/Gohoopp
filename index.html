@@ -1,301 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-
-<meta name="viewport"
-content="width=device-width,height=device-height,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-
-<title>Waifu Catcher</title>
-
-<!-- Telegram SDK -->
+<meta charset="UTF-8" />
+<title>Word Guess Whiteboard</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Inter:wght@400;600&display=swap" rel="stylesheet">
-
-<!-- Tailwind -->
-<script src="https://cdn.tailwindcss.com"></script>
-
-<script>
-tailwind.config = {
-  theme: {
-    extend: {
-      colors: {
-        night: "#020617",
-        deep: "#020b2d",
-        aurora: "#0ea5e9",
-        silver: "#cbd5e1",
-        gold: "#f5c77a"
-      },
-      boxShadow: {
-        glow: "0 0 28px rgba(14,165,233,.35)"
-      }
-    }
-  }
-}
-</script>
-
 <style>
-html,body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  touch-action:manipulation;
-  font-family:'Inter',sans-serif;
+body {
+    margin: 0;
+    background: #0f0f0f;
+    color: white;
+    font-family: Arial;
+    text-align: center;
 }
 
-/* 🌌 BACKGROUND */
-body{
-  background:
-    radial-gradient(circle at 30% 15%, rgba(14,165,233,.18), transparent 45%),
-    radial-gradient(circle at 70% 85%, rgba(56,189,248,.12), transparent 45%),
-    linear-gradient(180deg,#020617,#020b2d);
-  color:white;
+#toolbar {
+    padding: 10px;
+    background: #111;
 }
 
-/* 🌠 MOVING GALAXY */
-.galaxy{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-}
-.star-layer{
-  position:absolute;
-  inset:-50%;
-  background-image:
-    radial-gradient(1px 1px at 10% 20%,#fff,transparent),
-    radial-gradient(1px 1px at 40% 60%,#fff,transparent),
-    radial-gradient(1px 1px at 70% 30%,#fff,transparent),
-    radial-gradient(1px 1px at 85% 80%,#fff,transparent);
-  opacity:.25;
-  animation: drift 80s linear infinite;
-}
-.star-layer.slow{
-  opacity:.15;
-  animation-duration:160s;
-}
-@keyframes drift{
-  from{transform:translateY(0)}
-  to{transform:translateY(-500px)}
+button {
+    padding: 8px 12px;
+    margin: 5px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
 }
 
-/* ✨ GLASS + RIM */
-.glass{
-  background:rgba(255,255,255,.05);
-  backdrop-filter:blur(18px);
-}
-.rim{
-  position:relative;
-}
-.rim::before{
-  content:"";
-  position:absolute;
-  inset:0;
-  padding:1px;
-  border-radius:18px;
-  background:linear-gradient(135deg,#f5c77a,#cbd5e1,#0ea5e9);
-  -webkit-mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  -webkit-mask-composite:xor;
-}
-
-/* 🧠 TEXT */
-.cyber{
-  font-family:'Orbitron',sans-serif;
-  letter-spacing:.15em;
-}
-
-/* 🔮 LOADER */
-#loader{
-  position:fixed;
-  inset:0;
-  z-index:9999;
-  display:flex;
-}
-.loader-side{width:50%;background:#020617}
-.loader-center{
-  position:absolute;inset:0;
-  display:flex;flex-direction:column;
-  align-items:center;justify-content:center;
-}
-.loader-bar{
-  width:220px;height:4px;
-  background:rgba(255,255,255,.15);
-  border-radius:20px;overflow:hidden;
-}
-.loader-bar span{
-  display:block;height:100%;width:0%;
-  background:linear-gradient(90deg,#f5c77a,#0ea5e9);
-  animation:load 2s linear forwards;
-}
-@keyframes load{to{width:100%}}
-
-/* 📱 APP */
-#app{
-  opacity:0;transform:scale(.96);
-  transition:.8s ease;
-}
-#app.show{opacity:1;transform:scale(1)}
-
-/* ☰ MENU */
-#menu{
-  position:fixed;inset:0;
-  background:rgba(0,0,0,.55);
-  backdrop-filter:blur(10px);
-  transform:translateX(-100%);
-  transition:.4s ease;
-  z-index:9000;
-}
-#menu.show{transform:translateX(0)}
-.menu-panel{
-  width:85%;max-width:320px;height:100%;
-  background:linear-gradient(180deg,#020617,#020b2d);
-  padding:20px;
-}
-
-/* 🔘 TILE BUTTON */
-.tile{
-  transition:.25s ease;
-}
-.tile:active{
-  transform:translateY(-6px) scale(.98);
+#board {
+    background: white;
+    touch-action: none;
 }
 </style>
 </head>
-
 <body>
 
-<!-- 🌌 GALAXY -->
-<div class="galaxy">
-  <div class="star-layer slow"></div>
-  <div class="star-layer"></div>
+<div id="toolbar">
+    <span id="role"></span><br>
+    <button id="clear">🧹 Clear</button>
 </div>
 
-<!-- 🔮 LOADER -->
-<div id="loader">
-  <div class="loader-side"></div>
-  <div class="loader-side"></div>
-  <div class="loader-center">
-    <div class="cyber text-lg text-aurora mb-4">WAIFU CATCHER</div>
-    <div class="loader-bar"><span></span></div>
-  </div>
-</div>
-
-<!-- ☰ MENU -->
-<div id="menu">
-  <div class="menu-panel">
-    <div class="flex justify-between mb-6">
-      <div class="cyber text-sm">My Profile</div>
-      <button onclick="toggleMenu()">✕</button>
-    </div>
-    <p class="opacity-70 text-sm">Profile<br>Inventory<br>Settings</p>
-  </div>
-</div>
-
-<!-- 📱 APP -->
-<main id="app" class="relative max-w-[420px] mx-auto p-4 space-y-5 overflow-y-auto">
-
-<!-- ☰ MENU BTN -->
-<button onclick="toggleMenu()" class="absolute top-4 left-4 space-y-1 z-10">
-  <span class="block w-5 h-[2px] bg-silver"></span>
-  <span class="block w-5 h-[2px] bg-silver"></span>
-  <span class="block w-5 h-[2px] bg-silver"></span>
-</button>
-
-<header class="text-center cyber text-sm opacity-80 mt-2">
-  WAIFU CATCHER ✨
-</header>
-
-<!-- 👤 PROFILE (TALL) -->
-<section class="glass rim rounded-xl p-5 flex gap-4 items-center min-h-[110px]">
-  <div class="relative">
-    <img id="avatar" class="w-20 h-20 rounded-lg object-cover shadow-glow">
-    <div class="absolute inset-0 rounded-lg ring-1 ring-gold"></div>
-  </div>
-  <div>
-    <div id="name" class="cyber text-lg">Player</div>
-    <div id="username" class="text-sm opacity-60">@user</div>
-    <div id="userid" class="text-xs opacity-40">ID: —</div>
-  </div>
-</section>
-
-<!-- 🔘 SCROLLABLE ACTIONS -->
-<section class="space-y-4 pb-8">
-  <div class="glass rim rounded-xl p-4 tile" onclick="tap('myverse')">
-    <div class="cyber text-lg">MYVERSE ▾</div>
-    <div class="opacity-60 text-sm">Manage your collection</div>
-  </div>
-
-  <div class="glass rim rounded-xl p-4 tile" onclick="tap('fusion')">
-    <div class="cyber text-lg text-aurora">FUSION LAB ⚡</div>
-    <div class="opacity-60 text-sm">Fuse waifus for upgrades</div>
-  </div>
-
-  <div class="glass rim rounded-xl p-4 tile" onclick="tap('gacha')">
-    <div class="cyber text-lg text-gold">GACHA ✦</div>
-    <div class="opacity-60 text-sm">Summon rare waifus</div>
-  </div>
-</section>
-
-</main>
-
-<!-- 🔊 SOUND -->
-<audio id="bootSound" src="https://assets.mixkit.co/sfx/preview/mixkit-sci-fi-interface-zoom-890.mp3"></audio>
-<audio id="tapSound" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-click-1126.mp3"></audio>
+<canvas id="board" width="900" height="500"></canvas>
 
 <script>
-function toggleMenu(){
-  document.getElementById("menu").classList.toggle("show");
+const tg = window.Telegram.WebApp;
+tg.expand();
+
+const params = new URLSearchParams(window.location.search);
+const isExplainer = params.get("role") === "explainer";
+
+document.getElementById("role").innerText =
+    isExplainer ? "🎨 You are drawing" : "👀 View only";
+
+const canvas = document.getElementById("board");
+const ctx = canvas.getContext("2d");
+
+ctx.lineWidth = 4;
+ctx.lineCap = "round";
+
+let drawing = false;
+
+// ❌ VIEWERS CAN'T DRAW
+if (!isExplainer) {
+    document.getElementById("clear").style.display = "none";
+} else {
+    canvas.addEventListener("pointerdown", e => {
+        drawing = true;
+        ctx.beginPath();
+        ctx.moveTo(e.offsetX, e.offsetY);
+    });
+
+    canvas.addEventListener("pointermove", e => {
+        if (!drawing) return;
+        ctx.lineTo(e.offsetX, e.offsetY);
+        ctx.stroke();
+        sendData({
+            x: e.offsetX,
+            y: e.offsetY,
+            draw: true
+        });
+    });
+
+    canvas.addEventListener("pointerup", () => drawing = false);
 }
 
-function tap(action){
-  document.getElementById("tapSound").play().catch(()=>{});
-  if(window.Telegram?.WebApp){
-    Telegram.WebApp.HapticFeedback.impactOccurred("medium");
-    Telegram.WebApp.sendData(JSON.stringify({action}));
-  }
+// 🔁 SEND DATA TO BOT
+function sendData(data) {
+    tg.sendData(JSON.stringify(data));
 }
 
-document.addEventListener("DOMContentLoaded",()=>{
-  setTimeout(()=>{
-    loader.remove();
-    app.classList.add("show");
-    bootSound.volume=.4;
-    bootSound.play().catch(()=>{});
-  },2000);
+// 🧹 CLEAR BOARD
+document.getElementById("clear").onclick = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    sendData({ clear: true });
+};
 
-  if(!window.Telegram?.WebApp) return;
-  const tg=Telegram.WebApp;
-  tg.expand();tg.ready();
-
-  setTimeout(()=>{
-    const u=tg.initDataUnsafe?.user;
-    if(!u) return;
-    name.innerText=u.first_name||"Player";
-    username.innerText=u.username?"@"+u.username:"No username";
-    userid.innerText="ID: "+u.id;
-    if(u.photo_url) avatar.src=u.photo_url;
-  },400);
+// 🔁 RECEIVE DATA FROM BOT
+tg.onEvent("message", (event) => {
+    try {
+        const data = JSON.parse(event.data);
+        if (data.clear) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+        if (data.draw) {
+            ctx.lineTo(data.x, data.y);
+            ctx.stroke();
+        }
+    } catch {}
 });
 </script>
 
 </body>
 </html>
-
-
-{
-  "builds": [
-    {
-      "src": "shivu/web/app.py",
-      "use": "@vercel/python"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "shivu/web/app.py"
-    }
-  ]
-}
